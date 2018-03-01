@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+  <bpmn:process id="Process_BB_Bereitstellung_virtueller_Server_V2" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Virtueller Server beauftragt" camunda:formKey="embedded:/forms/vm_start_select.html" camunda:initiator="user">
+      <bpmn:outgoing>SequenceFlow_0n3pexp</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_1rygr29" name="Auftrag genehmigen" camunda:formKey="embedded:/forms/approval.html" camunda:assignee="manager" camunda:candidateGroups="managers">
+      <bpmn:incoming>SequenceFlow_0n3pexp</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0u5sia8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_04t1q4x" name="Auftrag genehmigt?">
+      <bpmn:incoming>SequenceFlow_0u5sia8</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ss1y0u</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_043spni</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0u5sia8" sourceRef="Task_1rygr29" targetRef="ExclusiveGateway_04t1q4x" />
+    <bpmn:subProcess id="SubProcess_1arm81x" name="System bereitstellen">
+      <bpmn:incoming>SequenceFlow_1ss1y0u</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0y3khg4</bpmn:outgoing>
+      <bpmn:startEvent id="StartEvent_1fp7mbo">
+        <bpmn:outgoing>SequenceFlow_0ly4xm6</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_0ly4xm6" sourceRef="StartEvent_1fp7mbo" targetRef="VM_Login" />
+      <bpmn:serviceTask id="Task_19o1u8h" name="VM erzeugen">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="url">${createVmUrl}</camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="content-type">application/json</camunda:entry>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                  <camunda:entry key="vmware-api-session-id">${cis}</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="payload"><![CDATA[{ 'spec': { 'guest_OS': 'RHEL_7_64', 'placement' : { datastore': 'datastore-11', 'folder': 'group-v224', 'resource_pool': 'resgroup-182' } } }]]></camunda:inputParameter>
+              <camunda:outputParameter name="result">
+                <camunda:script scriptFormat="javascript"><![CDATA[var system = java.lang.System;
+var response = connector.getVariable('response');
+system.out.println( response );
+var vmID = S(response).prop('value').value();
+connector.setVariable('vmID', vmID);]]></camunda:script>
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_1d93orl</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1rhrrg1</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1rhrrg1" sourceRef="Task_19o1u8h" targetRef="Task_17gmand" />
+      <bpmn:serviceTask id="Task_0240yt7" name="IP-Adresse  reservieren (mit MAC Adresse)">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="url">${reserveAddressUrl}</camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                  <camunda:entry key="content">application/json</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="payload"><![CDATA[{ 'name': '${vmID}.bb.de', 'ipv4addrs': [ { 'ipv4addr': 'func:nextavailableip:10.1.1.0/24', 'configure_for_dhcp': 'true', 'mac': '${vmMacAddr}' } ] }
+]]></camunda:inputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_1cjytqu</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1se9nc4</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="EndEvent_12u571f">
+        <bpmn:incoming>SequenceFlow_0ifx9bz</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:serviceTask id="Task_06zekcb" name="Betriebssystem und Software installieren (Aufgabe externer Apps)" camunda:type="external" camunda:topic="software_installieren">
+        <bpmn:incoming>SequenceFlow_1se9nc4</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0ifx9bz</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_0ifx9bz" sourceRef="Task_06zekcb" targetRef="EndEvent_12u571f" />
+      <bpmn:sequenceFlow id="SequenceFlow_1se9nc4" sourceRef="Task_0240yt7" targetRef="Task_06zekcb" />
+      <bpmn:sequenceFlow id="SequenceFlow_1d93orl" sourceRef="VM_Login" targetRef="Task_19o1u8h" />
+      <bpmn:serviceTask id="VM_Login" name="VMWare Login (CIS Session erzeugen)">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="url">${createCisSessionUrl}</camunda:inputParameter>
+              <camunda:inputParameter name="method">POST</camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                  <camunda:entry key="content">application/json</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="payload" />
+              <camunda:outputParameter name="result">
+                <camunda:script scriptFormat="javascript"><![CDATA[var system = java.lang.System;
+var response = connector.getVariable('response');
+system.out.println( response );
+var cis= S(response).prop('value').value();
+connector.setVariable('cis', cis);]]></camunda:script>
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_0ly4xm6</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1d93orl</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1cjytqu" sourceRef="Task_17gmand" targetRef="Task_0240yt7" />
+      <bpmn:serviceTask id="Task_17gmand" name="VM Parameter (MAC adresse) abfragen">
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="url">${createVmUrl}/${vmID}</camunda:inputParameter>
+              <camunda:inputParameter name="headers">
+                <camunda:map>
+                  <camunda:entry key="accept">application/json</camunda:entry>
+                  <camunda:entry key="content">application/json</camunda:entry>
+                  <camunda:entry key="vmware-api-session-id">${cis}</camunda:entry>
+                </camunda:map>
+              </camunda:inputParameter>
+              <camunda:inputParameter name="method">GET</camunda:inputParameter>
+              <camunda:inputParameter name="payload" />
+              <camunda:outputParameter name="result">
+                <camunda:script scriptFormat="javascript"><![CDATA[var system = java.lang.System;
+var response = connector.getVariable('response');
+system.out.println( response );
+var vmMacAddr= S(response).prop('nics').elements().get(0).prop('value').prop('mac_address').value();
+connector.setVariable('vmMacAddr', vmMacAddr);]]></camunda:script>
+              </camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>http-connector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_1rhrrg1</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1cjytqu</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:association id="Association_0a99v1j" sourceRef="Task_19o1u8h" targetRef="TextAnnotation_1a3jgar" />
+      <bpmn:association id="Association_0qei4l6" sourceRef="Task_0240yt7" targetRef="TextAnnotation_1q9iy21" />
+      <bpmn:association id="Association_1jlb19j" sourceRef="Task_06zekcb" targetRef="TextAnnotation_0uxwx8s" />
+      <bpmn:association id="Association_1hovyp0" sourceRef="VM_Login" targetRef="TextAnnotation_0tvm04s" />
+      <bpmn:association id="Association_0eqp5r4" sourceRef="Task_17gmand" targetRef="TextAnnotation_1ey46ya" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_1ss1y0u" name="ja" sourceRef="ExclusiveGateway_04t1q4x" targetRef="SubProcess_1arm81x">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isApproved == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_0wnqign" name="Virtueller Server bereitgestellt">
+      <bpmn:incoming>SequenceFlow_0y3khg4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0y3khg4" sourceRef="SubProcess_1arm81x" targetRef="EndEvent_0wnqign" />
+    <bpmn:endEvent id="EndEvent_0uc8bnq" name="Auftrag nicht genehmigt">
+      <bpmn:incoming>SequenceFlow_043spni</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_043spni" name="nein" sourceRef="ExclusiveGateway_04t1q4x" targetRef="EndEvent_0uc8bnq">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isApproved == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0n3pexp" sourceRef="StartEvent_1" targetRef="Task_1rygr29" />
+    <bpmn:textAnnotation id="TextAnnotation_1a3jgar">
+      <bpmn:text>Ansprache von VMware</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1q9iy21">
+      <bpmn:text>Ansprache von Infoblox IP</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0uxwx8s">
+      <bpmn:text>Ansprache von DSM, RHN oder HPE</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0tvm04s">
+      <bpmn:text>Ansprache von VMWare</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_1ey46ya">
+      <bpmn:text>Ansprache von VMWare</bpmn:text>
+    </bpmn:textAnnotation>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_BB_Bereitstellung_virtueller_Server_V2">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="286" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="264" y="138" width="81" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_05x6syi_di" bpmnElement="Task_1rygr29">
+        <dc:Bounds x="445" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_04t1q4x_di" bpmnElement="ExclusiveGateway_04t1q4x" isMarkerVisible="true">
+        <dc:Bounds x="592" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="621" y="135" width="58" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0u5sia8_di" bpmnElement="SequenceFlow_0u5sia8">
+        <di:waypoint xsi:type="dc:Point" x="545" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="592" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="523.5" y="99" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SubProcess_1arm81x_di" bpmnElement="SubProcess_1arm81x" isExpanded="true">
+        <dc:Bounds x="690" y="20" width="842" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ss1y0u_di" bpmnElement="SequenceFlow_1ss1y0u">
+        <di:waypoint xsi:type="dc:Point" x="642" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="690" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="660.5" y="99" width="11" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0wnqign_di" bpmnElement="EndEvent_0wnqign">
+        <dc:Bounds x="1697" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1677" y="142" width="78" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0y3khg4_di" bpmnElement="SequenceFlow_0y3khg4">
+        <di:waypoint xsi:type="dc:Point" x="1532" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1697" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1569.5" y="99" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0uc8bnq_di" bpmnElement="EndEvent_0uc8bnq">
+        <dc:Bounds x="1697" y="256" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1685" y="296" width="61" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_043spni_di" bpmnElement="SequenceFlow_043spni">
+        <di:waypoint xsi:type="dc:Point" x="617" y="145" />
+        <di:waypoint xsi:type="dc:Point" x="617" y="274" />
+        <di:waypoint xsi:type="dc:Point" x="1697" y="274" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="622" y="204" width="21" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1fp7mbo_di" bpmnElement="StartEvent_1fp7mbo">
+        <dc:Bounds x="706" y="103" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="679" y="143" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ly4xm6_di" bpmnElement="SequenceFlow_0ly4xm6">
+        <di:waypoint xsi:type="dc:Point" x="742" y="121" />
+        <di:waypoint xsi:type="dc:Point" x="778" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="715" y="100" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0snxxm8_di" bpmnElement="Task_19o1u8h">
+        <dc:Bounds x="916" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1rhrrg1_di" bpmnElement="SequenceFlow_1rhrrg1">
+        <di:waypoint xsi:type="dc:Point" x="1016" y="121" />
+        <di:waypoint xsi:type="dc:Point" x="1060" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="993" y="100" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0ayoniv_di" bpmnElement="Task_0240yt7">
+        <dc:Bounds x="1195" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1a3jgar_di" bpmnElement="TextAnnotation_1a3jgar">
+        <dc:Bounds x="916" y="-81" width="99.99156545209178" height="29.998877109625404" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0a99v1j_di" bpmnElement="Association_0a99v1j">
+        <di:waypoint xsi:type="dc:Point" x="966" y="81" />
+        <di:waypoint xsi:type="dc:Point" x="966" y="-51" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1q9iy21_di" bpmnElement="TextAnnotation_1q9iy21">
+        <dc:Bounds x="1195" y="-81" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0qei4l6_di" bpmnElement="Association_0qei4l6">
+        <di:waypoint xsi:type="dc:Point" x="1245" y="81" />
+        <di:waypoint xsi:type="dc:Point" x="1245" y="-51" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0uxwx8s_di" bpmnElement="TextAnnotation_0uxwx8s">
+        <dc:Bounds x="1331" y="-81" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_12u571f_di" bpmnElement="EndEvent_12u571f">
+        <dc:Bounds x="1463" y="103" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1436" y="143" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0n3pexp_di" bpmnElement="SequenceFlow_0n3pexp">
+        <di:waypoint xsi:type="dc:Point" x="322" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="445" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="383.5" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1611we0_di" bpmnElement="Task_06zekcb">
+        <dc:Bounds x="1331" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1jlb19j_di" bpmnElement="Association_1jlb19j">
+        <di:waypoint xsi:type="dc:Point" x="1381" y="81" />
+        <di:waypoint xsi:type="dc:Point" x="1381" y="-51" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ifx9bz_di" bpmnElement="SequenceFlow_0ifx9bz">
+        <di:waypoint xsi:type="dc:Point" x="1431" y="121" />
+        <di:waypoint xsi:type="dc:Point" x="1463" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1402" y="100" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1se9nc4_di" bpmnElement="SequenceFlow_1se9nc4">
+        <di:waypoint xsi:type="dc:Point" x="1295" y="121" />
+        <di:waypoint xsi:type="dc:Point" x="1331" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1268" y="100" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1d93orl_di" bpmnElement="SequenceFlow_1d93orl">
+        <di:waypoint xsi:type="dc:Point" x="878" y="121" />
+        <di:waypoint xsi:type="dc:Point" x="916" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="897" y="100" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0u40noy_di" bpmnElement="VM_Login">
+        <dc:Bounds x="778" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1cjytqu_di" bpmnElement="SequenceFlow_1cjytqu">
+        <di:waypoint xsi:type="dc:Point" x="1160" y="121" />
+        <di:waypoint xsi:type="dc:Point" x="1195" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1177.5" y="100" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_144pvjr_di" bpmnElement="Task_17gmand">
+        <dc:Bounds x="1060" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0tvm04s_di" bpmnElement="TextAnnotation_0tvm04s">
+        <dc:Bounds x="778" y="-81" width="99.99156545209178" height="40.48582995951417" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1hovyp0_di" bpmnElement="Association_1hovyp0">
+        <di:waypoint xsi:type="dc:Point" x="828" y="81" />
+        <di:waypoint xsi:type="dc:Point" x="828" y="-41" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1ey46ya_di" bpmnElement="TextAnnotation_1ey46ya">
+        <dc:Bounds x="1061.3468286099865" y="-86" width="99.99156545209178" height="40.48582995951417" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0eqp5r4_di" bpmnElement="Association_0eqp5r4">
+        <di:waypoint xsi:type="dc:Point" x="1110" y="81" />
+        <di:waypoint xsi:type="dc:Point" x="1111" y="-46" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

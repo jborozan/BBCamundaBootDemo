@@ -1,0 +1,57 @@
+<form role="form" name="form-approval">
+ 
+	<script cam-script type="text/form-script">
+		var variableManager = camForm.variableManager;
+
+		// acquire values of variables for the form
+		camForm.on('form-loaded', function() {
+			// tell the form SDK to fetch the variable named 'customer'
+			camForm.variableManager.fetchVariable('OSId');
+			camForm.variableManager.fetchVariable('vmMemory');
+			camForm.variableManager.fetchVariable('vmDisc');
+			camForm.variableManager.fetchVariable('vmWareHost');
+			camForm.variableManager.fetchVariable('infoBloxHost');
+		});
+
+		camForm.on('variables-fetched', function() {
+
+			// when variavle values are fetchen, create message
+			$scope.message = camForm.variableManager.variableValue('OSId') + ', Speicher ' + camForm.variableManager.variableValue('vmMemory') + 'GB, Festplatte ' + camForm.variableManager.variableValue('vmDisc') + 'GB';		
+		});
+
+		camForm.on('submit', function() {
+
+			// create new variables using *Host and add them to the form submit for later processing
+
+			camForm.variableManager.createVariable({
+				name: 'createCisSessionUrl',
+				type: 'String',
+				value: camForm.variableManager.variableValue('vmWareHost') + '/rest/com/vmware/cis/session',
+				isDirty: true
+			});
+			camForm.variableManager.createVariable({
+				name: 'createVmUrl',
+				type: 'String',
+				value: camForm.variableManager.variableValue('vmWareHost') + '/rest/vcenter/vm',
+				isDirty: true
+			});
+			camForm.variableManager.createVariable({
+				name: 'reserveAddressUrl',
+				type: 'String',
+				value: camForm.variableManager.variableValue('infoBloxHost') + '/wapi/v1.2/record:host',
+				isDirty: true
+			});
+
+		});
+	</script>
+  
+  	<h3>Ressourcen: {{ message }}</h3>
+  	
+	<div class="form-group">
+		<label for="isApproved-checkbox">Genehmigt</label>
+		<input type="checkbox" required
+			cam-variable-name="isApproved"
+			cam-variable-type="Boolean"
+			class="form-control" />
+	</div>
+</form>
