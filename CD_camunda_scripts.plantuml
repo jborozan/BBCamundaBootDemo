@@ -1,0 +1,17 @@
+@startuml
+
+package "Camunda Engine" {
+[BPMN Workflow] ..> [JavaScript] : uses
+[BPMN Workflow] ..> [Groovy] : uses
+[BPMN Workflow] ..> [Python] : uses
+}
+
+cloud {
+[BPMN] -down-> [BPMN Workflow] : provides
+}
+
+cloud {
+[BPMN Workflow] -right->  [Result]: outputs
+}
+
+@enduml

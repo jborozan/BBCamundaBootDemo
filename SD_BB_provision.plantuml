@@ -1,0 +1,38 @@
+@startuml
+
+User -> Camunda_Engine : start process \nenter parameter data
+activate Camunda_Engine
+
+Camunda_Engine -> VMWare : login or \ncreate cis session
+
+VMWare -> Camunda_Engine : return session id
+
+... use session id in consequent calls ...
+
+Camunda_Engine -> VMWare : create vm
+activate VMWare
+
+VMWare -> Camunda_Engine : return vm id
+deactivate VMWare
+
+Camunda_Engine -> VMWare : query vm parameters \nwith id
+
+VMWare -> Camunda_Engine : return vm parameters
+
+Camunda_Engine -> Camunda_Engine : filter mac address
+
+Camunda_Engine -> InfoBlox : ask IP address \nfor mac address
+activate InfoBlox
+
+InfoBlox -> InfoBlox : reserve IP address
+
+InfoBlox -> Camunda_Engine : return IP data
+deactivate InfoBlox
+
+... do some other tasks ...
+
+Camunda_Engine -> User : report process
+
+deactivate Camunda_Engine
+
+@enduml

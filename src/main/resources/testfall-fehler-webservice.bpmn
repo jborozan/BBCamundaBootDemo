@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+  <bpmn:process id="Process_BB_Test_Web_Service_Fehler_V1" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0dp2jza</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0dp2jza" sourceRef="StartEvent_1" targetRef="Task_0eepwyu" />
+    <bpmn:serviceTask id="Task_0eepwyu" name="Aufruf von nicht existirendes Web Service">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">http://localhost:9090/no-web-service</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="content">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:outputParameter name="result"><![CDATA[<empty>]]></camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0dp2jza</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0w42uqq</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_03h500h">
+      <bpmn:incoming>SequenceFlow_0q4gjkc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0w42uqq" sourceRef="Task_0eepwyu" targetRef="Task_17p4o2j" />
+    <bpmn:boundaryEvent id="BoundaryEvent_1s3vy88" name="Kein Web Service" attachedToRef="Task_0eepwyu">
+      <bpmn:outgoing>SequenceFlow_0cc4n25</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_0x3d5cb" camunda:errorCodeVariable="noWebServiceErrorCode" camunda:errorMessageVariable="noWebServiceErrorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0cc4n25" sourceRef="BoundaryEvent_1s3vy88" targetRef="Task_0crn4aw" />
+    <bpmn:endEvent id="EndEvent_073jgz0">
+      <bpmn:incoming>SequenceFlow_0686znx</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0686znx" sourceRef="Task_0crn4aw" targetRef="EndEvent_073jgz0" />
+    <bpmn:scriptTask id="Task_0crn4aw" name="Print Fehler Info" scriptFormat="javascript">
+      <bpmn:incoming>SequenceFlow_0cc4n25</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0686znx</bpmn:outgoing>
+      <bpmn:script><![CDATA[var system = java.lang.System;
+var response = execution.getVariable('noWebServiceErrorCode');
+system.err.println(' ** Fehler passierte mit dem Code: ' + response);
+response =  execution.getVariable('noWebServiceErrorMessage');
+system.err.println(' ** Fehler passierte mit der Meldung: ' + response);]]></bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0q4gjkc" sourceRef="Task_17p4o2j" targetRef="EndEvent_03h500h" />
+    <bpmn:scriptTask id="Task_17p4o2j" name="Sollte nie passieren" scriptFormat="javascript">
+      <bpmn:incoming>SequenceFlow_0w42uqq</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0q4gjkc</bpmn:outgoing>
+      <bpmn:script><![CDATA[var system = java.lang.system;
+system.out.println(' ** Erfolgreiches Aufruf');]]></bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:error id="Error_0x3d5cb" name="noWebService" errorCode="org.camunda.connect.ConnectorRequestException" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_BB_Test_Web_Service_Fehler_V1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="271" y="154" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="244" y="190" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dp2jza_di" bpmnElement="SequenceFlow_0dp2jza">
+        <di:waypoint xsi:type="dc:Point" x="307" y="172" />
+        <di:waypoint xsi:type="dc:Point" x="414" y="172" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="360.5" y="151" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1xpj0wh_di" bpmnElement="Task_0eepwyu">
+        <dc:Bounds x="414" y="132" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_03h500h_di" bpmnElement="EndEvent_03h500h">
+        <dc:Bounds x="782" y="154" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="194" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0w42uqq_di" bpmnElement="SequenceFlow_0w42uqq">
+        <di:waypoint xsi:type="dc:Point" x="514" y="172" />
+        <di:waypoint xsi:type="dc:Point" x="600" y="172" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="557" y="151" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_0v1jgue_di" bpmnElement="BoundaryEvent_1s3vy88">
+        <dc:Bounds x="462" y="194" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="438" y="234" width="88" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cc4n25_di" bpmnElement="SequenceFlow_0cc4n25">
+        <di:waypoint xsi:type="dc:Point" x="480" y="230" />
+        <di:waypoint xsi:type="dc:Point" x="480" y="329" />
+        <di:waypoint xsi:type="dc:Point" x="600" y="329" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="273.5" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_073jgz0_di" bpmnElement="EndEvent_073jgz0">
+        <dc:Bounds x="782" y="311" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="351" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0686znx_di" bpmnElement="SequenceFlow_0686znx">
+        <di:waypoint xsi:type="dc:Point" x="700" y="329" />
+        <di:waypoint xsi:type="dc:Point" x="782" y="329" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="741" y="308" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_08uchhf_di" bpmnElement="Task_0crn4aw">
+        <dc:Bounds x="600" y="289" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0q4gjkc_di" bpmnElement="SequenceFlow_0q4gjkc">
+        <di:waypoint xsi:type="dc:Point" x="700" y="172" />
+        <di:waypoint xsi:type="dc:Point" x="782" y="172" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="741" y="151" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0q85qhq_di" bpmnElement="Task_17p4o2j">
+        <dc:Bounds x="600" y="132" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

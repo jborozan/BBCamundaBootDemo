@@ -1,0 +1,28 @@
+@startuml
+
+rectangle camunda {
+(Camunda Cockpit) ..> (Camunda Engine) : monitors
+(Camunda Tasklist) --> (Camunda Engine) : controls
+}
+
+rectangle users {
+User --> (Camunda Tasklist) : uses
+User --> (Camunda Cockpit) : uses
+}
+
+(Camunda Cockpit) -right-> (Report) : produces
+(Report) .> User : is used by
+
+(Camunda Engine) <-- (BPMN) : deploys
+(Camunda Engine) <-- (Script App) : deploys
+(Camunda Engine) <-- (Java APP) : deploys
+(Modeler) -up-> (BPMN) : produces
+
+rectangle developers {
+Developer1 -up->  (Modeler) : uses
+(Script App) <-- Developer2 : produces
+(Java APP) <-- Developer2 : produces
+}
+
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+
+rectangle camunda {
+(Camunda Engine) --> (Generated Task Form) : generates
+(Camunda Engine) --> (Generic Task Forms) : uses
+(Camunda Engine) --> (Embedded Task Form) : uses
+}
+User1 .right.> (Generated Task Form) : enters data
+
+(Embedded Task Form) <.. User2 : enters data
+
+(Generic Task Forms) <.. User4 : enters data
+
+(External Form) --> (Camunda Engine) : provides data
+
+User3 .right.> (External Form) : enters data
+
+@enduml
