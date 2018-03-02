@@ -2,6 +2,11 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
   <bpmn:process id="Process_BB_Test_Web_Service_Fehler_V1" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="serviceUrl" label="Service URL" type="string" defaultValue="http://localhost:9090/no-web-service" />
+        </camunda:formData>
+      </bpmn:extensionElements>
       <bpmn:outgoing>SequenceFlow_0dp2jza</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0dp2jza" sourceRef="StartEvent_1" targetRef="Task_0eepwyu" />
@@ -9,7 +14,7 @@
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
-            <camunda:inputParameter name="url">http://localhost:9090/no-web-service</camunda:inputParameter>
+            <camunda:inputParameter name="url">${serviceUrl}</camunda:inputParameter>
             <camunda:inputParameter name="headers">
               <camunda:map>
                 <camunda:entry key="accept">application/json</camunda:entry>
@@ -18,6 +23,7 @@
             </camunda:inputParameter>
             <camunda:inputParameter name="method">GET</camunda:inputParameter>
             <camunda:outputParameter name="result"><![CDATA[<empty>]]></camunda:outputParameter>
+            <camunda:outputParameter name="statusCode">${statusCode}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -51,8 +57,9 @@ system.err.println(' ** Fehler passierte mit der Meldung: ' + response);]]></bpm
     <bpmn:scriptTask id="Task_17p4o2j" name="Sollte nie passieren" scriptFormat="javascript">
       <bpmn:incoming>SequenceFlow_0w42uqq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0q4gjkc</bpmn:outgoing>
-      <bpmn:script><![CDATA[var system = java.lang.system;
-system.out.println(' ** Erfolgreiches Aufruf');]]></bpmn:script>
+      <bpmn:script><![CDATA[var system = java.lang.System;
+var statusCode = execution.getVariable('statusCode');
+system.out.println(' ** Erfolgreiches Web Service Aufruf, HTTP Status Code: ' + statusCode);]]></bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmn:error id="Error_0x3d5cb" name="noWebService" errorCode="org.camunda.connect.ConnectorRequestException" />
