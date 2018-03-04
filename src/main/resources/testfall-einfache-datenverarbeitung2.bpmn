@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.8.2">
   <bpmn:process id="Process_BB_Einfache_Datenverarbeitung_V2" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_2" name="XML eingetroffen">
+    <bpmn:startEvent id="StartEvent_2" name="XML eingetroffen" camunda:asyncAfter="true">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="serviceUrl" label="XML Data Service URL" type="string" defaultValue="http://localhost:8090/serverlist" />
@@ -62,9 +62,8 @@
         <bpmn:incoming>SequenceFlow_1suibjq</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="SequenceFlow_1suibjq" sourceRef="Task_0o85gvo" targetRef="EndEvent_1wmbuxl" />
-      <bpmn:textAnnotation id="TextAnnotation_103zix0">
-        <bpmn:text>Derzeit nur console log </bpmn:text>
-      </bpmn:textAnnotation>
+      <bpmn:textAnnotation id="TextAnnotation_103zix0">      <bpmn:text>Derzeit nur Konsolenausgabe</bpmn:text>
+</bpmn:textAnnotation>
       <bpmn:association id="Association_1epa46t" sourceRef="Task_0o85gvo" targetRef="TextAnnotation_103zix0" />
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_18xo3x1" sourceRef="Task_1tziwag" targetRef="SubProcess_1e54zpz" />
@@ -72,10 +71,12 @@
       <bpmn:incoming>SequenceFlow_1uud7p2</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1uud7p2" sourceRef="SubProcess_1e54zpz" targetRef="EndEvent_0vk2lu9" />
-    <bpmn:textAnnotation id="TextAnnotation_0oh8qbo">
-      <bpmn:text>XML Daten von Web Service holen</bpmn:text>
-    </bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TextAnnotation_0oh8qbo">    <bpmn:text>XML Daten von Web Service holen</bpmn:text>
+</bpmn:textAnnotation>
     <bpmn:association id="Association_0peigku" sourceRef="Task_1tziwag" targetRef="TextAnnotation_0oh8qbo" />
+    <bpmn:textAnnotation id="TextAnnotation_0qh0jl2">    <bpmn:text>Multi-Instance</bpmn:text>
+</bpmn:textAnnotation>
+    <bpmn:association id="Association_0wo7ieo" sourceRef="SubProcess_1e54zpz" targetRef="TextAnnotation_0qh0jl2" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_BB_Einfache_Datenverarbeitung_V2">
@@ -162,18 +163,18 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0vk2lu9_di" bpmnElement="EndEvent_0vk2lu9">
-        <dc:Bounds x="1118" y="102" width="36" height="36" />
+        <dc:Bounds x="1118" y="118" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1093" y="142" width="86" height="24" />
+          <dc:Bounds x="1093" y="158" width="86" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1uud7p2_di" bpmnElement="SequenceFlow_1uud7p2">
         <di:waypoint xsi:type="dc:Point" x="1010" y="136" />
         <di:waypoint xsi:type="dc:Point" x="1059" y="136" />
-        <di:waypoint xsi:type="dc:Point" x="1059" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1118" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1059" y="136" />
+        <di:waypoint xsi:type="dc:Point" x="1118" y="136" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1029" y="122" width="90" height="12" />
+          <dc:Bounds x="1029" y="130" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_0oh8qbo_di" bpmnElement="TextAnnotation_0oh8qbo">
@@ -184,11 +185,18 @@
         <di:waypoint xsi:type="dc:Point" x="341" y="31" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="TextAnnotation_103zix0_di" bpmnElement="TextAnnotation_103zix0">
-        <dc:Bounds x="702" y="1.912280701754355" width="99.99156545209178" height="40.48582995951417" />
+        <dc:Bounds x="702" y="2" width="112" height="41" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Association_1epa46t_di" bpmnElement="Association_1epa46t">
-        <di:waypoint xsi:type="dc:Point" x="752" y="79" />
-        <di:waypoint xsi:type="dc:Point" x="752" y="42" />
+        <di:waypoint xsi:type="dc:Point" x="755" y="79" />
+        <di:waypoint xsi:type="dc:Point" x="757" y="43" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0qh0jl2_di" bpmnElement="TextAnnotation_0qh0jl2">
+        <dc:Bounds x="695" y="348" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0wo7ieo_di" bpmnElement="Association_0wo7ieo">
+        <di:waypoint xsi:type="dc:Point" x="745" y="295" />
+        <di:waypoint xsi:type="dc:Point" x="745" y="348" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

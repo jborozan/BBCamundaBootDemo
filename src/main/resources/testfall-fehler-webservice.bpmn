@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.8.2">
   <bpmn:process id="Process_BB_Test_Web_Service_Fehler_V1" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:extensionElements>
@@ -10,7 +10,7 @@
       <bpmn:outgoing>SequenceFlow_0dp2jza</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0dp2jza" sourceRef="StartEvent_1" targetRef="Task_0eepwyu" />
-    <bpmn:serviceTask id="Task_0eepwyu" name="Aufruf von nicht existirendes Web Service">
+    <bpmn:serviceTask id="Task_0eepwyu" name="Web-Service aufrufen">
       <bpmn:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
@@ -35,7 +35,7 @@
       <bpmn:incoming>SequenceFlow_0q4gjkc</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0w42uqq" sourceRef="Task_0eepwyu" targetRef="Task_17p4o2j" />
-    <bpmn:boundaryEvent id="BoundaryEvent_1s3vy88" name="Kein Web Service" attachedToRef="Task_0eepwyu">
+    <bpmn:boundaryEvent id="BoundaryEvent_1s3vy88" name="Web-Service nicht verfügbar" attachedToRef="Task_0eepwyu">
       <bpmn:outgoing>SequenceFlow_0cc4n25</bpmn:outgoing>
       <bpmn:errorEventDefinition errorRef="Error_0x3d5cb" camunda:errorCodeVariable="noWebServiceErrorCode" camunda:errorMessageVariable="noWebServiceErrorMessage" />
     </bpmn:boundaryEvent>
@@ -44,7 +44,7 @@
       <bpmn:incoming>SequenceFlow_0686znx</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0686znx" sourceRef="Task_0crn4aw" targetRef="EndEvent_073jgz0" />
-    <bpmn:scriptTask id="Task_0crn4aw" name="Print Fehler Info" scriptFormat="javascript">
+    <bpmn:scriptTask id="Task_0crn4aw" name="Fehler ausgeben" scriptFormat="javascript">
       <bpmn:incoming>SequenceFlow_0cc4n25</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0686znx</bpmn:outgoing>
       <bpmn:script><![CDATA[var system = java.lang.System;
@@ -54,7 +54,7 @@ response =  execution.getVariable('noWebServiceErrorMessage');
 system.err.println(' ** Fehler passierte mit der Meldung: ' + response);]]></bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="SequenceFlow_0q4gjkc" sourceRef="Task_17p4o2j" targetRef="EndEvent_03h500h" />
-    <bpmn:scriptTask id="Task_17p4o2j" name="Sollte nie passieren" scriptFormat="javascript">
+    <bpmn:scriptTask id="Task_17p4o2j" name="Sollte nicht durchlaufen werden" scriptFormat="javascript">
       <bpmn:incoming>SequenceFlow_0w42uqq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0q4gjkc</bpmn:outgoing>
       <bpmn:script><![CDATA[var system = java.lang.System;
@@ -97,7 +97,7 @@ system.out.println(' ** Erfolgreiches Web Service Aufruf, HTTP Status Code: ' + 
       <bpmndi:BPMNShape id="BoundaryEvent_0v1jgue_di" bpmnElement="BoundaryEvent_1s3vy88">
         <dc:Bounds x="462" y="194" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="438" y="234" width="88" height="12" />
+          <dc:Bounds x="437" y="234" width="90" height="25" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0cc4n25_di" bpmnElement="SequenceFlow_0cc4n25">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.8.2">
   <bpmn:process id="Process_BB_Test_lokal_Befehl_V1" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1">
+    <bpmn:startEvent id="StartEvent_1" camunda:asyncAfter="true">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="cliCommand" label="Lokal Befehl" type="string" defaultValue="cmd.exe /c dir" />
@@ -10,7 +10,7 @@
       <bpmn:outgoing>SequenceFlow_19occh4</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_19occh4" sourceRef="StartEvent_1" targetRef="Task_10obpry" />
-    <bpmn:serviceTask id="Task_10obpry" name="Lokal Befehlaufruf" camunda:delegateExpression="${runCommandDelegate}">
+    <bpmn:serviceTask id="Task_10obpry" name="Lokalen Befehl aufrufen" camunda:asyncAfter="true" camunda:delegateExpression="${runCommandDelegate}">
       <bpmn:incoming>SequenceFlow_19occh4</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1hl10yl</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -19,7 +19,7 @@
       <bpmn:incoming>SequenceFlow_1n9p5nw</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1n9p5nw" sourceRef="Task_0sg0kqc" targetRef="EndEvent_0jhduco" />
-    <bpmn:scriptTask id="Task_0sg0kqc" name="Befehl Output Loggen" scriptFormat="javascript">
+    <bpmn:scriptTask id="Task_0sg0kqc" name="Output des Befehls loggen" scriptFormat="javascript">
       <bpmn:incoming>SequenceFlow_1hl10yl</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1n9p5nw</bpmn:outgoing>
       <bpmn:script><![CDATA[var system = java.lang.System;
