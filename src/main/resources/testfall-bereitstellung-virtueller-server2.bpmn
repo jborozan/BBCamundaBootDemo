@@ -4,7 +4,7 @@
     <bpmn:startEvent id="StartEvent_1" name="Virtueller Server beauftragt" camunda:formKey="embedded:/forms/vm_start_select.html" camunda:initiator="user">
       <bpmn:outgoing>SequenceFlow_0n3pexp</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:userTask id="Task_1rygr29" name="Auftrag genehmigen" camunda:formKey="embedded:/forms/approval.html" camunda:assignee="manager" camunda:candidateGroups="managers">
+    <bpmn:userTask id="Task_1rygr29" name="Auftrag genehmigen" camunda:formKey="embedded:/forms/approval.html" camunda:assignee="manager">
       <bpmn:incoming>SequenceFlow_0n3pexp</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0u5sia8</bpmn:outgoing>
     </bpmn:userTask>
