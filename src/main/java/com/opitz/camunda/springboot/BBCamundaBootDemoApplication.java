@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.function.Consumer;
 
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin;
 import org.camunda.spin.xml.SpinXmlElement;
@@ -70,8 +71,8 @@ public class BBCamundaBootDemoApplication {
 					// set error as variable
 					execution.setVariable("cliCommandError", outBuffer.toString());
 
-				} catch(Exception ignore) {
-					ignore.printStackTrace();
+				} catch(Exception ex) {
+					throw new BpmnError( ex.getMessage() );
 				}
 			};
 	}
@@ -118,20 +119,20 @@ public class BBCamundaBootDemoApplication {
 	 * Prevents CORS failure when using Angular front end in browser
 	 * @return Cors Filter bean that allows Cross-Origin Resource Sharing (https://de.wikipedia.org/wiki/Cross-Origin_Resource_Sharing)
 	 */
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
+	@Bean
+	public CorsFilter corsFilter() {
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    CorsConfiguration config = new CorsConfiguration();
+	    config.setAllowCredentials(true);
+	    config.addAllowedOrigin("*");
+	    config.addAllowedHeader("*");
+	    config.addAllowedMethod("OPTIONS");
+	    config.addAllowedMethod("GET");
+	    config.addAllowedMethod("POST");
+	    config.addAllowedMethod("PUT");
+	    config.addAllowedMethod("DELETE");
+	    source.registerCorsConfiguration("/**", config);
+	    return new CorsFilter(source);
+	}
 
 }
