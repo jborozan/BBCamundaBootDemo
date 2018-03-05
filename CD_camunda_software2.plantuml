@@ -1,0 +1,17 @@
+@startuml
+
+package "Camunda" {
+[Camunda Engine]
+}
+[Software 1] .right.> REST_API : use
+REST_API -- [Camunda Engine] : provides
+[Software 2] -down- WS1 : provide
+WS1 <.. [Camunda Engine] : use
+[Software 3] -- WS2 : provides
+[Camunda Engine] .up.> WS2 : use
+WS3 -- [Software 4] : provides 
+[Camunda Engine] .right.> WS3 : use
+[Software 5] -right- WS4 : provides
+[Camunda Engine] ..> WS4 : use
+
+@enduml

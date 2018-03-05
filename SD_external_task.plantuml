@@ -1,0 +1,22 @@
+@startuml
+
+User -> Camunda_Engine : start process
+activate Camunda_Engine
+
+External -> Camunda_Engine : poll task
+activate External
+
+... after some time ...
+
+External -> Camunda_Engine : complete task
+deactivate External
+
+Camunda_Engine -> Camunda_Engine : use data
+
+... after some time ...
+
+Camunda_Engine -> User : report process
+
+deactivate Camunda_Engine
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+
+[Camunda] -- ExternalTask
+ExternalTask  <.. [Software 1] : use
+REST -- [Software 2]
+[Camunda] ..> REST : use
+SOAP -- [Software 3]
+[Camunda] ..> SOAP : use
+JDBC -- [Software 4]
+[Camunda] ..> JDBC : JavaDelegate
+SSH -- [Software 5]
+[Camunda] ..> SSH : JavaDelegate
+
+@enduml
