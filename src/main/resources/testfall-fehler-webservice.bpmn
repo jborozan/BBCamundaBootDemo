@@ -62,7 +62,7 @@ var statusCode = execution.getVariable('statusCode');
 system.out.println(' ** Erfolgreiches Web Service Aufruf, HTTP Status Code: ' + statusCode);]]></bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
-  <bpmn:error id="Error_0x3d5cb" name="noWebService" errorCode="org.camunda.connect.ConnectorRequestException" />
+  <bpmn:error id="Error_0x3d5cb" name="noWebService" errorCode="org.camunda.connect.ConnectorException" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_BB_Test_Web_Service_Fehler_V1">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
