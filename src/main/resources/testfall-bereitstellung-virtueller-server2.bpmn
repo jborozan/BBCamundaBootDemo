@@ -109,7 +109,7 @@ connector.setVariable('cis', cis);]]></camunda:script>
         <bpmn:outgoing>SequenceFlow_1d93orl</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_1cjytqu" sourceRef="Task_17gmand" targetRef="Task_0240yt7" />
-      <bpmn:serviceTask id="Task_17gmand" name="VM Parameter abfragen (MAC adresse) " camunda:asyncAfter="true">
+      <bpmn:serviceTask id="Task_17gmand" name="VM Parameter abfragen (MAC adresse)" camunda:asyncAfter="true">
         <bpmn:extensionElements>
           <camunda:connector>
             <camunda:inputOutput>
