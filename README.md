@@ -63,3 +63,16 @@ To authentificate access to EE repository, there is a need to adapt (or create) 
 		</server>
 	</servers>
 ```
+
+### H2 Database
+
+To se content of H2 in memory database, use following URL in web browser:
+```
+http://localhost:8080/h2-console
+```
+and following database URL (leave user sa without password):
+```
+jdbc:h2:mem:testdb
+```
+Demo table is called computers.
+
