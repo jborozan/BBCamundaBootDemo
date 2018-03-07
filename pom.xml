@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.10.RELEASE</version>
+		<version>1.5.8.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -21,40 +21,40 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<camunda.version>7.8.0-ee</camunda.version>
+    	<spring.boot.version>1.5.8.RELEASE</spring.boot.version>
+    	<camunda.spring.boot.starter.version>2.3.0</camunda.spring.boot.starter.version>		
 	</properties>
+		
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+			  <groupId>org.springframework.boot</groupId>
+			  <artifactId>spring-boot-dependencies</artifactId>
+			  <version>${spring.boot.version}</version>
+			  <type>pom</type>
+			  <scope>import</scope>
+			</dependency>
+			<dependency>
+			  <groupId>org.camunda.bpm</groupId>
+			  <artifactId>camunda-bom</artifactId>
+			  <version>${camunda.version}</version>
+			  <type>pom</type>
+			  <scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+		    <groupId>org.camunda.bpm.springboot</groupId>
+		    <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
+		    <version>${camunda.spring.boot.starter.version}</version>
 		</dependency>
-
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.camunda.bpm.springboot</groupId>
-			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
-    
-
-
-		<dependency>
-			<groupId>org.camunda.bpm.springboot</groupId>
-			<artifactId>
-				camunda-bpm-spring-boot-starter-rest
-			</artifactId>
-			<version>2.3.0</version>
-		</dependency>
+		    <groupId>com.h2database</groupId>
+		    <artifactId>h2</artifactId>
+		   </dependency>
 		<dependency>
 			<groupId>org.camunda.connect</groupId>
 			<artifactId>camunda-connect-connectors-all</artifactId>
@@ -86,6 +86,11 @@
 			<version>1.4.2</version>
 		</dependency>
 		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.python</groupId>
 			<artifactId>jython-standalone</artifactId>
 			<version>2.7.1</version>
@@ -95,32 +100,41 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+			  <groupId>org.springframework.boot</groupId>
+			  <artifactId>spring-boot-maven-plugin</artifactId>
+			  <configuration>
+			    <layout>ZIP</layout>
+			  </configuration>
+			  <executions>
+			    <execution>
+			      <goals>
+			        <goal>repackage</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+			</plugin>
+			<plugin>
+			  <artifactId>maven-compiler-plugin</artifactId>
+			  <version>2.3.1</version>
+			  <configuration>
+			    <source>1.8</source>
+			    <target>1.8</target>
+			  </configuration>
 			</plugin>
 		</plugins>
 	</build>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.camunda.bpm</groupId>
-				<artifactId>camunda-bom</artifactId>
-				<version>7.8.0</version>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.camunda.connect</groupId>
-				<artifactId>camunda-connect-bom</artifactId>
-				<version>1.0.6</version>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.camunda.spin</groupId>
-				<artifactId>camunda-spin-bom</artifactId>
-				<version>1.4.2</version>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<repositories>
+		<repository>
+		  <id>Camunda-Repository</id>
+		  <name>camunda-bpm-nexus</name>
+		  <url>https://app.camunda.com/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+		  <id>Camunda-EE-Repository</id>
+		  <name>camunda-bpm-ee</name>
+		  <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
+		</repository>
+	</repositories>
+
 </project>

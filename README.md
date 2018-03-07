@@ -49,3 +49,17 @@ To implement JavaDelegates, use lambdas - very short and practical:
 	    return execution -> System.out.println("Logging something from javaDelegate... Hello");
 	}
 ```
+
+### EE Camunda
+
+To authentificate access to EE repository, there is a need to adapt (or create) ~/.m2/settings.xml with similar content
+
+```
+	<servers>
+		<server>
+			<id>Camunda-EE-Repository</id>
+			<username>...</username>
+			<password>...</password>
+		</server>
+	</servers>
+```
