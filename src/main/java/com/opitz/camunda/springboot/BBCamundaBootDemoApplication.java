@@ -2,18 +2,27 @@ package com.opitz.camunda.springboot;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin;
 import org.camunda.spin.xml.SpinXmlElement;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 /**
  * 
@@ -22,6 +31,9 @@ import org.springframework.web.filter.CorsFilter;
  */
 @SpringBootApplication
 public class BBCamundaBootDemoApplication {
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(BBCamundaBootDemoApplication.class, args);
@@ -135,4 +147,45 @@ public class BBCamundaBootDemoApplication {
 	    return new CorsFilter(source);
 	}
 
+	/**
+	 * Inits H2 database in memory and creates table computers
+	 * @return
+	 */
+	@Bean
+	public DataSource dataSource() {
+
+		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+		EmbeddedDatabase db = builder
+			.setType(EmbeddedDatabaseType.H2)
+			.addScript("db/schema.sql")
+			.build();
+		return db;
+	}
+	
+	/**
+	 * This java delegate saves sub elements from XML server elelment into database
+	 * @return java delegate
+	 */
+	@Bean(name="dbServerOsDelegate")
+	public JavaDelegate dbServerOsDelegate() {
+		
+	    return execute -> 
+	    	{	    		
+	    		// get Camunda variable from execution context as XML element
+	    		SpinXmlElement server = (SpinXmlElement) execute.getVariable("server");
+	    		
+	    		int id = (new Random().nextInt(1000) + 1);
+	    		String os = server.childElement("os").textContent();
+	    		String hostname = server.childElement("hostname").textContent();
+	    		
+	    		jdbcTemplate.update("insert into computers(id, hostname, os) values(?, ?, ?)",
+	    				new Object[] { id, hostname, os});
+	    		
+	    		// print out content of XML element
+	    		System.out.println(" ** server content saved to db: id=" + id + ", os=" + os + ", hostname=" + hostname );
+	    		
+	    	};
+	}
+
+	
 }
