@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.11.3">
+  <bpmn:process id="Process_BB_Test_SSH_Befehl_V1" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="sshUser" label="Benutzername" type="string" defaultValue="user" />
+          <camunda:formField id="sshHost" label="Hostname" type="string" defaultValue="localhost" />
+          <camunda:formField id="sshPort" label="Host Port" type="long" defaultValue="22" />
+          <camunda:formField id="sshPass" label="Passwort/Passphase" type="string" />
+          <camunda:formField id="sshPrivKeyFile" label="SSH Private Key Datei" type="string" />
+          <camunda:formField id="sshKnownHosts" label="Bekannte SSH Host Datei" type="string" />
+          <camunda:formField id="sshCommand" label="Befehl" type="string" defaultValue="ls -al" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>SequenceFlow_1u1km5u</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1u1km5u" sourceRef="StartEvent_1" targetRef="Task_0y0c62r" />
+    <bpmn:serviceTask id="Task_0y0c62r" name="SSH Befehl Ausführen" camunda:delegateExpression="${sshCommandDelegate}">
+      <bpmn:incoming>SequenceFlow_1u1km5u</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0qyhkcd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0qyhkcd" sourceRef="Task_0y0c62r" targetRef="Task_1s6lax5" />
+    <bpmn:endEvent id="EndEvent_0grvat0">
+      <bpmn:incoming>SequenceFlow_0iouuoa</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0iouuoa" sourceRef="Task_1s6lax5" targetRef="EndEvent_0grvat0" />
+    <bpmn:scriptTask id="Task_1s6lax5" name="Output des Befehls loggen" scriptFormat="javascript">
+      <bpmn:incoming>SequenceFlow_0qyhkcd</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0iouuoa</bpmn:outgoing>
+      <bpmn:script><![CDATA[var system = java.lang.System;
+var response = execution.getVariable('sshCommandOutput');
+system.out.println( '** sshCommandOutput: ' + response );
+var response = execution.getVariable('sshCommandError');
+system.err.println( '** sshCommandError: ' + response );]]></bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_BB_Test_SSH_Befehl_V1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="219" y="188" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="192" y="224" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1u1km5u_di" bpmnElement="SequenceFlow_1u1km5u">
+        <di:waypoint xsi:type="dc:Point" x="255" y="206" />
+        <di:waypoint xsi:type="dc:Point" x="398" y="206" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="326.5" y="185" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0xpkg6n_di" bpmnElement="Task_0y0c62r">
+        <dc:Bounds x="398" y="166" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qyhkcd_di" bpmnElement="SequenceFlow_0qyhkcd">
+        <di:waypoint xsi:type="dc:Point" x="498" y="206" />
+        <di:waypoint xsi:type="dc:Point" x="608" y="206" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="553" y="185" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0grvat0_di" bpmnElement="EndEvent_0grvat0">
+        <dc:Bounds x="808" y="188" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="826" y="228" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0iouuoa_di" bpmnElement="SequenceFlow_0iouuoa">
+        <di:waypoint xsi:type="dc:Point" x="708" y="206" />
+        <di:waypoint xsi:type="dc:Point" x="808" y="206" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="758" y="185" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_139l84q_di" bpmnElement="Task_1s6lax5">
+        <dc:Bounds x="608" y="166" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
