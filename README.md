@@ -77,3 +77,5 @@ jdbc:h2:mem:testdb
 Demo table is called computers.
 
 ### SSH execution added
+
+Try to prepare and use docker image as host with SSHD.
