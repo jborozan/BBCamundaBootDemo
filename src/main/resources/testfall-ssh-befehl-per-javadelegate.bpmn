@@ -8,8 +8,8 @@
           <camunda:formField id="sshHost" label="Hostname" type="string" defaultValue="localhost" />
           <camunda:formField id="sshPort" label="Host Port" type="long" defaultValue="22" />
           <camunda:formField id="sshPass" label="Passwort/Passphase" type="string" />
-          <camunda:formField id="sshPrivKeyFile" label="SSH Private Key Datei" type="string" />
-          <camunda:formField id="sshKnownHosts" label="Bekannte SSH Host Datei" type="string" />
+          <camunda:formField id="sshPrivKeyFile" label="SSH Private Key Datei" type="string" defaultValue="c:\Users\JUR\.ssh\id_rsa" />
+          <camunda:formField id="sshKnownHosts" label="Bekannte SSH Host Datei" type="string" defaultValue="c:\Users\JUR\.ssh\known_hosts" />
           <camunda:formField id="sshCommand" label="Befehl" type="string" defaultValue="ls -al" />
         </camunda:formData>
       </bpmn:extensionElements>
