@@ -2,7 +2,6 @@ package com.opitz.camunda.springboot;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -18,7 +17,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
@@ -41,8 +39,71 @@ public class BBCamundaBootDemoApplication {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
+	/**
+	 * Main
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(BBCamundaBootDemoApplication.class, args);
+	}
+
+	/**
+	 * Enables Camunda Content Process Engine Plug-ins - needed to enable usage of Connector and SPIN plug-ins
+	 * @return Camunda Content Process Engine Plug-in 
+	 */
+	@Bean
+	public ConnectProcessEnginePlugin connectProcessEnginePlugin() {
+	  return new ConnectProcessEnginePlugin();
+	}
+	
+	/**
+	 * Returns bean which implements CORS filter permissions
+	 * Prevents CORS failure when using Angular front end in browser
+	 * @return Cors Filter bean that allows Cross-Origin Resource Sharing (https://de.wikipedia.org/wiki/Cross-Origin_Resource_Sharing)
+	 */
+	@Bean
+	public CorsFilter corsFilter() {
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    CorsConfiguration config = new CorsConfiguration();
+	    config.setAllowCredentials(true);
+	    config.addAllowedOrigin("*");
+	    config.addAllowedHeader("*");
+	    config.addAllowedMethod("OPTIONS");
+	    config.addAllowedMethod("GET");
+	    config.addAllowedMethod("POST");
+	    config.addAllowedMethod("PUT");
+	    config.addAllowedMethod("DELETE");
+	    source.registerCorsConfiguration("/**", config);
+	    return new CorsFilter(source);
+	}
+
+	/**
+	 * Returns a bean that inits H2 database in memory and creates table computers
+	 * @return
+	 */
+	@Bean
+	public DataSource dataSource() {
+
+		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+		EmbeddedDatabase db = builder
+			.setType(EmbeddedDatabaseType.H2)
+			.addScript("db/schema.sql")
+			.build();
+		return db;
+	}
+
+	/******************
+	 * Java Delegates *
+	 ******************/
+	
+	/**
+	 * Returns bean which implements JavaDelegate interface
+	 * @return dummy JavaDelegate that prints hello
+	 */
+	@Bean(name="javaDelegate")
+	public JavaDelegate sayHelloDelegate() {
+		
+	    return execution -> System.out.println("Logging something from javaDelegate... Hello");
 	}
 	
     /**
@@ -113,61 +174,6 @@ public class BBCamundaBootDemoApplication {
 	    	};
 	}
 
-	/**
-	 * Returns bean which implements JavaDelegate interface
-	 * @return dummy JavaDelegate that prints hello
-	 */
-	@Bean(name="javaDelegate")
-	public JavaDelegate sayHelloDelegate() {
-		
-	    return execution -> System.out.println("Logging something from javaDelegate... Hello");
-	}
-
-	/**
-	 * Enables Camunda Content Process Engine Plug-ins - needed to enable usage of Connector and SPIN plug-ins
-	 * @return Camunda Content Process Engine Plug-in 
-	 */
-	@Bean
-	public ConnectProcessEnginePlugin connectProcessEnginePlugin() {
-	  return new ConnectProcessEnginePlugin();
-	}
-	
-	/**
-	 * Returns bean which implements CORS filter permissions
-	 * Prevents CORS failure when using Angular front end in browser
-	 * @return Cors Filter bean that allows Cross-Origin Resource Sharing (https://de.wikipedia.org/wiki/Cross-Origin_Resource_Sharing)
-	 */
-	@Bean
-	public CorsFilter corsFilter() {
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    CorsConfiguration config = new CorsConfiguration();
-	    config.setAllowCredentials(true);
-	    config.addAllowedOrigin("*");
-	    config.addAllowedHeader("*");
-	    config.addAllowedMethod("OPTIONS");
-	    config.addAllowedMethod("GET");
-	    config.addAllowedMethod("POST");
-	    config.addAllowedMethod("PUT");
-	    config.addAllowedMethod("DELETE");
-	    source.registerCorsConfiguration("/**", config);
-	    return new CorsFilter(source);
-	}
-
-	/**
-	 * Returns a bean that inits H2 database in memory and creates table computers
-	 * @return
-	 */
-	@Bean
-	public DataSource dataSource() {
-
-		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-		EmbeddedDatabase db = builder
-			.setType(EmbeddedDatabaseType.H2)
-			.addScript("db/schema.sql")
-			.build();
-		return db;
-	}
-	
 	/**
 	 * Returns java delegate that saves sub elements from XML server element into database
 	 * @return java delegate
