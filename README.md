@@ -76,3 +76,4 @@ jdbc:h2:mem:testdb
 ```
 Demo table is called computers.
 
+### SSH execution added
